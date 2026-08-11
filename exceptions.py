@@ -1,41 +1,32 @@
 class CustomError(Exception):
-    """Base class for other exceptions"""
+    """Base class for custom exceptions."""
     pass
 
 class NotFoundError(CustomError):
-    """Raised when a requested resource is not found"""
+    """Exception raised when a resource is not found."""
     def __init__(self, resource):
         self.resource = resource
-        self.message = f'Resource {self.resource} not found'
+        self.message = f'Resource {resource} was not found.'
         super().__init__(self.message)
 
 class ValidationError(CustomError):
-    """Raised when validation fails"""
+    """Exception raised for validation errors."""
     def __init__(self, field, message):
         self.field = field
-        self.message = f'Validation error on {self.field}: {message}'
+        self.message = message
         super().__init__(self.message)
 
-class PermissionError(CustomError):
-    """Raised when permission is denied"""
-    def __init__(self, action):
-        self.action = action
-        self.message = f'Permission denied for action: {self.action}'
+class DatabaseError(CustomError):
+    """Exception raised for database related errors."""
+    def __init__(self, error_code, message):
+        self.error_code = error_code
+        self.message = message
         super().__init__(self.message)
 
-# Example usage
+class AuthenticationError(CustomError):
+    """Exception raised for authentication failures."""
+    pass
 
-try:
-    raise NotFoundError('User')
-except CustomError as e:
-    print(e.message)
-
-try:
-    raise ValidationError('email', 'Invalid format')
-except CustomError as e:
-    print(e.message)
-
-try:
-    raise PermissionError('delete data')
-except CustomError as e:
-    print(e.message)
+class PermissionDeniedError(CustomError):
+    """Exception raised when access is denied."""
+    pass
