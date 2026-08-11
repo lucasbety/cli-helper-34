@@ -1,33 +1,36 @@
-import json
+import time
+import requests
+from requests.exceptions import RequestException
 
-class CustomError(Exception):
-    pass
+def retry_decorator(max_retries=3, delay=2):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            attempts = 0
+            while attempts < max_retries:
+                try:
+                    return func(*args, **kwargs)
+                except RequestException as e:
+                    attempts += 1
+                    if attempts < max_retries:
+                        print(f'Retry {attempts}/{max_retries} for {func.__name__}. Error: {e}')
+                        time.sleep(delay)
+                    else:
+                        print(f'Max retries reached for {func.__name__}. Error: {e}')
+                        raise
+        return wrapper
+    return decorator
 
-class DataProcessor:
-    def __init__(self, data):
-        self.data = data
+@retry_decorator(max_retries=5, delay=3)
+def fetch_data(url):
+    response = requests.get(url)
+    response.raise_for_status()  # Will raise an error for bad responses
+    return response.json()  
 
-    def process_data(self):
-        if not self.data:
-            raise CustomError('No data provided')
-        try:
-            processed_data = [self._transform(item) for item in self.data]
-            return processed_data
-        except Exception as e:
-            raise CustomError(f'Error processing data: {str(e)}')
-
-    def _transform(self, item):
-        if not isinstance(item, dict):
-            raise ValueError('Expected a dictionary')
-        return {k: v.upper() for k, v in item.items()}
-
+# Example usage
 if __name__ == '__main__':
-    sample_data = [{'name': 'python'}, {'name': 'cli'}, None]
-    processor = DataProcessor(sample_data)
+    url = 'https://api.example.com/data'
     try:
-        result = processor.process_data()  
-        print(json.dumps(result, indent=4))
-    except CustomError as ce:
-        print(f'Custom error: {ce}')
-    except ValueError as ve:
-        print(f'Value error: {ve}')
+        data = fetch_data(url)
+        print(data)
+    except Exception:
+        print('Failed to fetch data')
