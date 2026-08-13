@@ -1,21 +1,30 @@
 class CustomError(Exception):
-    """Base class for custom exceptions."""
-    pass
-
-class InvalidInputError(CustomError):
-    """Raised when the input is invalid."""
-    def __init__(self, message):
+    """Custom exception for handling specific errors in the application."""
+    def __init__(self, message: str) -> None:
+        """Initialize the CustomError with a message."""
+        super().__init__(message)
         self.message = message
-        super().__init__(self.message)
 
-class ResourceNotFoundError(CustomError):
-    """Raised when a requested resource is not found."""
-    def __init__(self, resource_name):
-        self.message = f'Resource {resource_name} was not found.'
-        super().__init__(self.message)
 
-class OperationFailedError(CustomError):
-    """Raised when an operation fails."""
-    def __init__(self, operation_name):
-        self.message = f'Operation {operation_name} failed.'
-        super().__init__(self.message)
+class ValidationError(CustomError):
+    """Exception raised for validation errors."""
+    def __init__(self, field: str, message: str) -> None:
+        """Initialize the ValidationError with a field and message."""
+        super().__init__(message)
+        self.field = field
+
+
+class DatabaseError(CustomError):
+    """Exception raised for database related errors."""
+    def __init__(self, db_message: str) -> None:
+        """Initialize the DatabaseError with a database message."""
+        super().__init__(db_message)
+        self.db_message = db_message
+
+
+class NotFoundError(CustomError):
+    """Exception raised when a resource is not found."""
+    def __init__(self, resource: str) -> None:
+        """Initialize the NotFoundError with a resource name."""
+        super().__init__(f'{resource} not found.')
+        self.resource = resource
