@@ -1,34 +1,20 @@
 import re
 
-class InputValidator:
-    @staticmethod
-    def validate_email(email: str) -> bool:
-        """
-        Validate an email address using a regex pattern.
-        """
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        return re.match(pattern, email) is not None
+# Compile patterns for performance
+email_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+phone_pattern = re.compile(r'^(\+?[1-9]{1,4})?[-.\s]?\(?[2-9][0-9]{2}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$')
 
-    @staticmethod
-    def validate_phone(phone: str) -> bool:
-        """
-        Validate a phone number format (e.g., (123) 456-7890).
-        """
-        pattern = r'^\(\d{3}\) \d{3}-\d{4}$'
-        return re.match(pattern, phone) is not None
+def validate_email(email):
+    """Validate if the input is a valid email address."""
+    return bool(email_pattern.match(email))
 
-    @staticmethod
-    def validate_username(username: str) -> bool:
-        """
-        Validate a username with specific rules: between 3-20 characters,
-        only alphanumeric characters and underscores allowed.
-        """
-        pattern = r'^[a-zA-Z0-9_]{3,20}$'
-        return re.match(pattern, username) is not None
+def validate_phone(phone):
+    """Validate if the input is a valid phone number."""
+    return bool(phone_pattern.match(phone))
 
-# Example usage of validators
+# Example test cases
 if __name__ == '__main__':
-    print(InputValidator.validate_email('test@example.com'))  # True
-    print(InputValidator.validate_phone('(123) 456-7890'))  # True
-    print(InputValidator.validate_username('user_name123'))  # True
-    
+    print(validate_email('test@example.com'))  # Expected: True
+    print(validate_email('invalid-email'))      # Expected: False
+    print(validate_phone('+123-456-7890'))      # Expected: True
+    print(validate_phone('123-45-6789'))        # Expected: False
