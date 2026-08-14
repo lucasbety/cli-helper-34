@@ -1,26 +1,32 @@
-import time
-import requests
+import os
+import json
 
-class NetworkError(Exception):
-    pass
+def read_json(file_path):
+    """Read a JSON file and return its content."""
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"{file_path} not found")
+    with open(file_path, 'r') as file:
+        return json.load(file)
 
 
-def retry_request(url, retries=3, delay=2):
-    """
-    Attempts to send a GET request to the specified URL with retry logic.
-    :param url: The URL to send the request to.
-    :param retries: Number of retry attempts.
-    :param delay: Delay between attempts in seconds.
-    :return: The response object if successful.
-    """
-    for attempt in range(retries):
-        try:
-            response = requests.get(url)
-            response.raise_for_status()  # Raise an error for bad responses
-            return response
-        except requests.exceptions.RequestException as e:
-            if attempt < retries - 1:
-                print(f'Retry {attempt + 1}/{retries} failed: {e}. Retrying in {delay} seconds...')
-                time.sleep(delay)
-            else:
-                raise NetworkError(f'Failed to reach {url} after {retries} attempts.') from e
+def write_json(file_path, data):
+    """Write Python dictionary to a JSON file."""
+    with open(file_path, 'w') as file:
+        json.dump(data, file, indent=4)
+
+
+def create_directory(dir_path):
+    """Create a directory if it doesn’t exist."""
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+
+def list_files(directory):
+    """List all files in a given directory."""
+    return [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+
+
+def current_timestamp():
+    """Return the current timestamp as a string."""
+    from datetime import datetime
+    return datetime.now().isoformat()
