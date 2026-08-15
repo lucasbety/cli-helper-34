@@ -1,30 +1,29 @@
-class CustomError(Exception):
-    """Custom exception for handling specific errors in the application."""
-    def __init__(self, message: str) -> None:
-        """Initialize the CustomError with a message."""
-        super().__init__(message)
+class InvalidInputError(Exception):
+    """Exception raised for invalid inputs in the application."""
+    def __init__(self, message):
         self.message = message
+        super().__init__(self.message)
 
 
-class ValidationError(CustomError):
-    """Exception raised for validation errors."""
-    def __init__(self, field: str, message: str) -> None:
-        """Initialize the ValidationError with a field and message."""
-        super().__init__(message)
-        self.field = field
+def validate_input(user_input):
+    """Validates the user input for the application."""
+    if not isinstance(user_input, str):
+        raise InvalidInputError("Input must be a string.")
+    if not user_input.strip():
+        raise InvalidInputError("Input cannot be empty.")
+    # Add additional validations as required
 
 
-class DatabaseError(CustomError):
-    """Exception raised for database related errors."""
-    def __init__(self, db_message: str) -> None:
-        """Initialize the DatabaseError with a database message."""
-        super().__init__(db_message)
-        self.db_message = db_message
+def main_processing_loop():
+    """Main loop for processing user input with validation."""
+    while True:
+        user_input = input('Enter data: ')
+        try:
+            validate_input(user_input)
+            # Process the validated input
+            print(f'Processing input: {user_input}')
+        except InvalidInputError as e:
+            print(f'Error: {e.message}')
 
-
-class NotFoundError(CustomError):
-    """Exception raised when a resource is not found."""
-    def __init__(self, resource: str) -> None:
-        """Initialize the NotFoundError with a resource name."""
-        super().__init__(f'{resource} not found.')
-        self.resource = resource
+if __name__ == '__main__':
+    main_processing_loop()
