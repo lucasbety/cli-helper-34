@@ -1,32 +1,44 @@
-import os
 import json
+from typing import Any, Dict, Union
 
-def read_json(file_path):
-    """Read a JSON file and return its content."""
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"{file_path} not found")
-    with open(file_path, 'r') as file:
-        return json.load(file)
+class ValidationError(Exception):
+    pass
 
+def safe_json_loads(data: str) -> Union[Dict[str, Any], None]:
+    try:
+        return json.loads(data)
+    except json.JSONDecodeError:
+        print('Error: Invalid JSON input.')
+        return None
+    except Exception as e:
+        print(f'Unexpected error: {e}')
+        return None
 
-def write_json(file_path, data):
-    """Write Python dictionary to a JSON file."""
-    with open(file_path, 'w') as file:
-        json.dump(data, file, indent=4)
+def safe_divide(numerator: float, denominator: float) -> float:
+    try:
+        if denominator == 0:
+            raise ValueError('Denominator cannot be zero.')
+        return numerator / denominator
+    except ValueError as ve:
+        print(ve)
+        return float('inf')  # Return infinity for division by zero
+    except Exception as e:
+        print(f'Unexpected error during division: {e}')
+        return None
 
+def validate_and_parse_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    required_keys = ['host', 'port', 'username']
+    for key in required_keys:
+        if key not in config:
+            raise ValidationError(f'Missing required key: {key}')
+    return config
 
-def create_directory(dir_path):
-    """Create a directory if it doesn’t exist."""
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
+# Example use of safe_json_loads and safe_divide
+data = '{"key": "value"}'
+parsed_data = safe_json_loads(data)
+result = safe_divide(10, 0)
 
-
-def list_files(directory):
-    """List all files in a given directory."""
-    return [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
-
-
-def current_timestamp():
-    """Return the current timestamp as a string."""
-    from datetime import datetime
-    return datetime.now().isoformat()
+if parsed_data:
+    print(parsed_data)
+if result != float('inf'):
+    print(f'Result: {result}')
