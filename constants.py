@@ -1,27 +1,30 @@
-import json
-import os
+import time
+import random
 
-DEFAULT_CONFIG = {
-    'setting1': 'value1',
-    'setting2': 'value2',
-    'setting3': True,
-}
+RETRIES = 3  # Number of retries for network operations
+BACKOFF_FACTOR = 2  # Exponential backoff factor
 
-CONFIG_FILE = 'config.json'
+class NetworkException(Exception):
+    pass
 
 
-def load_config():
-    """Load configuration from a JSON file.
-    If the file does not exist, use default values.
-    """
-    if os.path.isfile(CONFIG_FILE):
-        with open(CONFIG_FILE, 'r') as f:
+def retry_on_failure(func):
+    """Decorator to retry a network operation on failure."""
+    def wrapper(*args, **kwargs):
+        for attempt in range(RETRIES):
             try:
-                config = json.load(f)
-                return {**DEFAULT_CONFIG, **config}
-            except json.JSONDecodeError:
-                print('Error decoding JSON, using default config.')
-                return DEFAULT_CONFIG
-    else:
-        print('Config file not found, using default config.')
-        return DEFAULT_CONFIG
+                return func(*args, **kwargs)
+            except NetworkException as e:
+                if attempt < RETRIES - 1:
+                    wait_time = BACKOFF_FACTOR ** attempt + random.uniform(0, 1)
+                    time.sleep(wait_time)  # Exponential backoff
+                else:
+                    raise e  # Exceeded retries
+    return wrapper
+
+@retry_on_failure
+def perform_network_operation():
+    # Simulated network operation that raises an exception
+    if random.random() < 0.7:  # 70% chance of failure
+        raise NetworkException("Network error occurred")
+    return "Network operation successful!"
