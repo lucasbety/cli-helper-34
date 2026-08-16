@@ -1,30 +1,38 @@
-import time
-import random
+import os
 
-RETRIES = 3  # Number of retries for network operations
-BACKOFF_FACTOR = 2  # Exponential backoff factor
+# File types constant
+TEXT_FILE = '.txt'
+CSV_FILE = '.csv'
+JSON_FILE = '.json'
 
-class NetworkException(Exception):
-    pass
+# Status constants
+SUCCESS = 0
+FAILURE = 1
 
+# Default configurations
+DEFAULT_ENCODING = 'utf-8'
+DEFAULT_DELIMITER = ','
 
-def retry_on_failure(func):
-    """Decorator to retry a network operation on failure."""
-    def wrapper(*args, **kwargs):
-        for attempt in range(RETRIES):
-            try:
-                return func(*args, **kwargs)
-            except NetworkException as e:
-                if attempt < RETRIES - 1:
-                    wait_time = BACKOFF_FACTOR ** attempt + random.uniform(0, 1)
-                    time.sleep(wait_time)  # Exponential backoff
-                else:
-                    raise e  # Exceeded retries
-    return wrapper
+# API URLs
+BASE_API_URL = 'https://api.example.com/'
+USER_ENDPOINT = BASE_API_URL + 'users/'
+POST_ENDPOINT = BASE_API_URL + 'posts/'
 
-@retry_on_failure
-def perform_network_operation():
-    # Simulated network operation that raises an exception
-    if random.random() < 0.7:  # 70% chance of failure
-        raise NetworkException("Network error occurred")
-    return "Network operation successful!"
+# Common message templates
+ERROR_MESSAGE = 'An error occurred while processing your request.'
+SUCCESS_MESSAGE = 'Operation completed successfully.'
+
+# File size limits (in bytes)
+MAX_FILE_SIZE = 10485760  # 10 MB
+MIN_FILE_SIZE = 1024       # 1 KB
+
+# Environment variables
+ENV_MODE = os.getenv('ENV_MODE', 'development')
+DEBUG_MODE = os.getenv('DEBUG_MODE', 'false').lower() == 'true'
+
+# Logging constants
+LOG_LEVEL = 'DEBUG'
+LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+
+# Other constants
+TIMEOUT_DURATION = 30  # in seconds
