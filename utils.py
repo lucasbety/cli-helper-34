@@ -1,44 +1,46 @@
-from typing import List, Dict, Any
-
-
-def flatten_list(nested_list: List[List[Any]]) -> List[Any]:
+def safe_divide(numerator, denominator):
     """
-    Flattens a nested list into a single list.
-
-    Args:
-        nested_list (List[List[Any]]): A list containing lists to be flattened.
-
-    Returns:
-        List[Any]: A single list containing all elements from the nested lists.
+    Safely divide two numbers with error handling for edge cases.
     """
-    return [item for sublist in nested_list for item in sublist]
+    try:
+        if not isinstance(numerator, (int, float)) or not isinstance(denominator, (int, float)):
+            raise TypeError('Both numerator and denominator must be numbers.')
+        if denominator == 0:
+            raise ZeroDivisionError('Denominator cannot be zero.')
+        return numerator / denominator
+    except TypeError as te:
+        print(f'Error: {te}')
+        return None
+    except ZeroDivisionError as zde:
+        print(f'Error: {zde}')
+        return None
 
 
-def merge_dicts(dicts: List[Dict[str, Any]]) -> Dict[str, Any]:
+def parse_int(value):
     """
-    Merges a list of dictionaries into a single dictionary.
-
-    Args:
-        dicts (List[Dict[str, Any]]): A list of dictionaries to be merged.
-
-    Returns:
-        Dict[str, Any]: A single dictionary containing all key-value pairs.
+    Parse an integer from a string, handling edge cases.
     """
-    merged = {}
-    for d in dicts:
-        merged.update(d)
-    return merged
+    try:
+        return int(value)
+    except ValueError:
+        print(f'Error: Unable to convert {value} to an integer.')
+        return None
 
 
-def chunk_list(data: List[Any], chunk_size: int) -> List[List[Any]]:
+def load_data(file_path):
     """
-    Divides a list into chunks of a specified size.
-
-    Args:
-        data (List[Any]): The list to be divided.
-        chunk_size (int): The size of each chunk.
-
-    Returns:
-        List[List[Any]]: A list containing chunks of the original list.
+    Load data from a JSON file with error handling.
     """
-    return [data[i:i + chunk_size] for i in range(0, len(data), chunk_size)]
+    try:
+        with open(file_path, 'r') as file:
+            import json
+            return json.load(file)
+    except FileNotFoundError:
+        print(f'Error: File {file_path} not found.')
+        return None
+    except json.JSONDecodeError:
+        print('Error: File is not a valid JSON.')
+        return None
+    except Exception as e:
+        print(f'An unexpected error occurred: {e}')
+        return None
