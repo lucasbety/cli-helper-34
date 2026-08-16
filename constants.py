@@ -1,38 +1,39 @@
-import os
+DATA_TYPE_INTEGER = 'integer'
+DATA_TYPE_STRING = 'string'
+DATA_TYPE_FLOAT = 'float'
 
-# File types constant
-TEXT_FILE = '.txt'
-CSV_FILE = '.csv'
-JSON_FILE = '.json'
+# Default configurations for data handling
+default_config = {
+    'max_length': 255,
+    'min_length': 1,
+    'allowed_types': [DATA_TYPE_STRING, DATA_TYPE_INTEGER, DATA_TYPE_FLOAT],
+}
 
-# Status constants
-SUCCESS = 0
-FAILURE = 1
+# Common error messages for validation
+ERROR_MESSAGES = {
+    'type_error': 'Invalid data type',
+    'length_error': 'Data length out of bounds',
+}
 
-# Default configurations
-DEFAULT_ENCODING = 'utf-8'
-DEFAULT_DELIMITER = ','
+# Status codes for data processing
+STATUS_SUCCESS = 0
+STATUS_FAILURE = 1
+STATUS_PENDING = 2
 
-# API URLs
-BASE_API_URL = 'https://api.example.com/'
-USER_ENDPOINT = BASE_API_URL + 'users/'
-POST_ENDPOINT = BASE_API_URL + 'posts/'
+# Function to get default configurations
 
-# Common message templates
-ERROR_MESSAGE = 'An error occurred while processing your request.'
-SUCCESS_MESSAGE = 'Operation completed successfully.'
+def get_default_config():
+    return default_config
 
-# File size limits (in bytes)
-MAX_FILE_SIZE = 10485760  # 10 MB
-MIN_FILE_SIZE = 1024       # 1 KB
+# Function to retrieve error message by key
 
-# Environment variables
-ENV_MODE = os.getenv('ENV_MODE', 'development')
-DEBUG_MODE = os.getenv('DEBUG_MODE', 'false').lower() == 'true'
+def get_error_message(key):
+    return ERROR_MESSAGES.get(key, 'Unknown error')
 
-# Logging constants
-LOG_LEVEL = 'DEBUG'
-LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+# Function to validate data type
 
-# Other constants
-TIMEOUT_DURATION = 30  # in seconds
+def validate_data_type(data, expected_type):
+    actual_type = type(data).__name__
+    if actual_type == expected_type:
+        return True
+    return False
