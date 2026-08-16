@@ -1,29 +1,24 @@
-class InvalidInputError(Exception):
-    """Exception raised for invalid inputs in the application."""
+class CustomError(Exception):
+    """Base class for exceptions in this module."""
+    pass
+
+class FileNotFound(CustomError):
+    """Exception raised for errors in the file not found operations."""
+    def __init__(self, filename):
+        self.filename = filename
+        self.message = f'File not found: {self.filename}'
+        super().__init__(self.message)
+
+class ValidationError(CustomError):
+    """Exception raised for validation errors."""
     def __init__(self, message):
         self.message = message
         super().__init__(self.message)
 
-
-def validate_input(user_input):
-    """Validates the user input for the application."""
-    if not isinstance(user_input, str):
-        raise InvalidInputError("Input must be a string.")
-    if not user_input.strip():
-        raise InvalidInputError("Input cannot be empty.")
-    # Add additional validations as required
-
-
-def main_processing_loop():
-    """Main loop for processing user input with validation."""
-    while True:
-        user_input = input('Enter data: ')
-        try:
-            validate_input(user_input)
-            # Process the validated input
-            print(f'Processing input: {user_input}')
-        except InvalidInputError as e:
-            print(f'Error: {e.message}')
-
-if __name__ == '__main__':
-    main_processing_loop()
+class ConnectionError(CustomError):
+    """Exception raised for connection related issues."""
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
+        self.message = f'Connection failed to {self.host}:{self.port}'
+        super().__init__(self.message)
