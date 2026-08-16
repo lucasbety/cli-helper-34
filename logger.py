@@ -1,48 +1,34 @@
 import logging
-import sys
+
+# Configure the logger
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+# Create a logger
+logger = logging.getLogger(__name__)
 
 class Logger:
-    def __init__(self, name, log_file='app.log', level=logging.INFO):
+    def __init__(self, name):
         self.logger = logging.getLogger(name)
-        self.logger.setLevel(level)
-        handler = logging.FileHandler(log_file)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
 
-    def info(self, message):
-        self.logger.info(message)
+    def debug(self, msg):
+        self.logger.debug(msg)
 
-    def debug(self, message):
-        self.logger.debug(message)
+    def info(self, msg):
+        self.logger.info(msg)
 
-    def warning(self, message):
-        self.logger.warning(message)
+    def warning(self, msg):
+        self.logger.warning(msg)
 
-    def error(self, message):
-        self.logger.error(message)
+    def error(self, msg):
+        self.logger.error(msg)
 
-    def critical(self, message):
-        self.logger.critical(message)
+    def critical(self, msg):
+        self.logger.critical(msg)
 
-    def log_execution_time(self, func):
-        import time
-        def wrapper(*args, **kwargs):
-            start_time = time.time()
-            result = func(*args, **kwargs)
-            end_time = time.time()
-            self.logger.info(f'Execution time of {func.__name__}: {end_time - start_time:.4f} seconds')
-            return result
-        return wrapper
-
-# Usage example
+# Example usage within the module
 if __name__ == '__main__':
-    log = Logger(__name__)
-    log.info('Logger initialized')
-
-    @log.log_execution_time
-    def sample_function():
-        time.sleep(2)
-        log.info('Sample function executed')
-
-    sample_function()
+    log = Logger('exampleLogger')
+    log.info('Logger initialized and ready.')
