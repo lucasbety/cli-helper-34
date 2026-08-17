@@ -1,24 +1,32 @@
-import os
 import json
+import os
 
-class Config:
+DEFAULT_CONFIG = {
+    'setting1': 'value1',
+    'setting2': 10,
+    'setting3': True
+}
+
+class ConfigLoader:
     def __init__(self, config_file='config.json'):
         self.config_file = config_file
-        self.config_data = self.load_config()
+        self.configuration = self.load_configuration()
 
-    def load_config(self):
-        if not os.path.isfile(self.config_file):
-            raise FileNotFoundError(f'Config file {self.config_file} not found')
-        with open(self.config_file, 'r') as file:
-            return json.load(file)
+    def load_configuration(self):
+        if os.path.exists(self.config_file):
+            with open(self.config_file, 'r') as file:
+                try:
+                    user_config = json.load(file)
+                    return self.merge_configs(DEFAULT_CONFIG, user_config)
+                except json.JSONDecodeError:
+                    print('Error reading the configuration file. Using defaults.')
+        return DEFAULT_CONFIG
 
-    def get(self, key, default=None):
-        return self.config_data.get(key, default)
+    def merge_configs(self, default, user):
+        config = default.copy()  # start with the default config
+        config.update(user)      # update with user config
+        return config
 
-    def set(self, key, value):
-        self.config_data[key] = value
-        self.save_config()
-
-    def save_config(self):
-        with open(self.config_file, 'w') as file:
-            json.dump(self.config_data, file, indent=4)
+# Usage example:
+# loader = ConfigLoader()
+# print(loader.configuration)  # Outputs the merged config
