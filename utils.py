@@ -1,46 +1,38 @@
-def safe_divide(numerator, denominator):
-    """
-    Safely divide two numbers with error handling for edge cases.
-    """
-    try:
-        if not isinstance(numerator, (int, float)) or not isinstance(denominator, (int, float)):
-            raise TypeError('Both numerator and denominator must be numbers.')
-        if denominator == 0:
-            raise ZeroDivisionError('Denominator cannot be zero.')
-        return numerator / denominator
-    except TypeError as te:
-        print(f'Error: {te}')
-        return None
-    except ZeroDivisionError as zde:
-        print(f'Error: {zde}')
-        return None
+import json
+
+class FileReadError(Exception):
+    pass
+
+class JSONDecodeError(Exception):
+    pass
 
 
-def parse_int(value):
-    """
-    Parse an integer from a string, handling edge cases.
-    """
-    try:
-        return int(value)
-    except ValueError:
-        print(f'Error: Unable to convert {value} to an integer.')
-        return None
-
-
-def load_data(file_path):
-    """
-    Load data from a JSON file with error handling.
-    """
+def read_json_file(file_path):
+    """Reads a JSON file and returns its content as a Python dictionary."""
     try:
         with open(file_path, 'r') as file:
-            import json
-            return json.load(file)
+            data = json.load(file)
+            return data
     except FileNotFoundError:
-        print(f'Error: File {file_path} not found.')
-        return None
+        raise FileReadError(f"File not found: {file_path}")
     except json.JSONDecodeError:
-        print('Error: File is not a valid JSON.')
-        return None
+        raise JSONDecodeError(f"JSON decode error in file: {file_path}")
     except Exception as e:
-        print(f'An unexpected error occurred: {e}')
-        return None
+        raise FileReadError(f"An error occurred: {str(e)}")
+
+
+def write_json_file(file_path, data):
+    """Writes a Python dictionary to a JSON file."""
+    try:
+        with open(file_path, 'w') as file:
+            json.dump(data, file, ensure_ascii=False, indent=4)
+    except Exception as e:
+        raise FileReadError(f"An error occurred while writing to {file_path}: {str(e)}")
+
+
+def validate_data(data):
+    """Validates that the data is a dictionary before processing."""
+    if not isinstance(data, dict):
+        raise ValueError("Data must be a dictionary.")
+
+        
