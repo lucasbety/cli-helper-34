@@ -1,38 +1,36 @@
-import json
-
-class FileReadError(Exception):
-    pass
-
-class JSONDecodeError(Exception):
-    pass
+import time
+from functools import wraps
 
 
-def read_json_file(file_path):
-    """Reads a JSON file and returns its content as a Python dictionary."""
-    try:
-        with open(file_path, 'r') as file:
-            data = json.load(file)
-            return data
-    except FileNotFoundError:
-        raise FileReadError(f"File not found: {file_path}")
-    except json.JSONDecodeError:
-        raise JSONDecodeError(f"JSON decode error in file: {file_path}")
-    except Exception as e:
-        raise FileReadError(f"An error occurred: {str(e)}")
+def timeit(func):
+    """Decorator to measure execution time of a function."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        execution_time = end_time - start_time
+        print(f"{func.__name__} executed in {execution_time:.4f} seconds")
+        return result
+    return wrapper
 
 
-def write_json_file(file_path, data):
-    """Writes a Python dictionary to a JSON file."""
-    try:
-        with open(file_path, 'w') as file:
-            json.dump(data, file, ensure_ascii=False, indent=4)
-    except Exception as e:
-        raise FileReadError(f"An error occurred while writing to {file_path}: {str(e)}")
+def memoize(func):
+    """Decorator to cache function results for performance optimization."""
+    cache = {}
+    @wraps(func)
+    def wrapper(*args):
+        if args in cache:
+            return cache[args]
+        result = func(*args)
+        cache[args] = result
+        return result
+    return wrapper
 
 
-def validate_data(data):
-    """Validates that the data is a dictionary before processing."""
-    if not isinstance(data, dict):
-        raise ValueError("Data must be a dictionary.")
-
-        
+@timeit
+@memoize
+def compute_value(x, y):
+    """Expensive computation that we want to optimize."""
+    time.sleep(1)  # Simulating a time-consuming operation
+    return x * y
