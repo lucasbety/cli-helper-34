@@ -1,31 +1,28 @@
 class CustomError(Exception):
-    """Base class for exceptions in this module."""
+    """Base class for other exceptions."""
     pass
 
+
 class ValidationError(CustomError):
-    """Exception raised for validation errors."""
-    def __init__(self, message, field):
-        self.message = message
-        self.field = field
-        super().__init__(self.message)
-
-    def __str__(self):
-        return f'ValidationError: {self.message} for field: {self.field}'
-
-class ConfigurationError(CustomError):
-    """Exception raised for configuration errors."""
+    """Raised when validation of input fails."""
     def __init__(self, message):
         self.message = message
         super().__init__(self.message)
-
-    def __str__(self):
-        return f'ConfigurationError: {self.message}'
 
 class ProcessingError(CustomError):
-    """Exception raised for processing errors."""
-    def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
+    """Raised when processing encounters an error."""
+    def __init__(self, details):
+        self.details = details
+        super().__init__(f'Processing error: {self.details}')
 
-    def __str__(self):
-        return f'ProcessingError: {self.message}'
+class FileNotFoundError(CustomError):
+    """Raised when the specified file is not found."""
+    def __init__(self, filename):
+        self.filename = filename
+        super().__init__(f'File not found: {self.filename}')
+
+class PermissionError(CustomError):
+    """Raised when permission is denied for an operation."""
+    def __init__(self, operation):
+        self.operation = operation
+        super().__init__(f'Permission denied for operation: {self.operation}')
