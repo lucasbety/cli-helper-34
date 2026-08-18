@@ -1,32 +1,31 @@
-import time
-import requests
+import json
+import os
 
-class NetworkError(Exception):
-    pass
+class FileProcessor:
+    def __init__(self, file_path):
+        self.file_path = file_path
 
-def retry_request(url, retries=3, delay=2):
-    """
-    Perform a GET request with retry logic.
-    :param url: The URL to send the request to.
-    :param retries: Number of times to retry on failure.
-    :param delay: Delay between retries in seconds.
-    :return: The response object if successful.
-    """
-    for attempt in range(retries):
+    def read_file(self):
         try:
-            response = requests.get(url)
-            response.raise_for_status()  # Raise an error for bad responses
-            return response
-        except requests.exceptions.RequestException as e:
-            if attempt < retries - 1:
-                time.sleep(delay)
-                continue  # Retry
-            raise NetworkError(f"Network request failed after {retries} attempts: {e}")
+            if not os.path.exists(self.file_path):
+                raise FileNotFoundError(f'File {self.file_path} does not exist.')
+            with open(self.file_path, 'r') as file:
+                return file.read()
+        except FileNotFoundError as e:
+            return json.dumps({'error': str(e)})
+        except IOError as e:
+            return json.dumps({'error': 'An I/O error occurred: ' + str(e)})
 
-# Example usage of the retry_request function
+    def write_file(self, content):
+        try:
+            with open(self.file_path, 'w') as file:
+                file.write(content)
+        except IOError as e:
+            return json.dumps({'error': 'Failed to write file: ' + str(e)})
+
+# Usage example
 if __name__ == '__main__':
-    try:
-        response = retry_request('https://jsonplaceholder.typicode.com/posts')
-        print(response.json())
-    except NetworkError as e:
-        print(e)
+    processor = FileProcessor('example.txt')
+    print(processor.read_file())
+    print(processor.write_file('Hello, World!'))
+    print(processor.read_file())
