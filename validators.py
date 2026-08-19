@@ -1,28 +1,45 @@
-import re
+def validate_positive_integer(value):
+    """Validates if the provided value is a positive integer."""
+    if not isinstance(value, int):
+        raise ValueError("Input must be an integer.")
+    if value <= 0:
+        raise ValueError("Input must be a positive integer.")
+    return True
 
-class ValidationError(Exception):
-    pass
 
-def validate_email(email):
+def validate_non_empty_string(value):
+    """Validates if the provided value is a non-empty string."""
+    if not isinstance(value, str):
+        raise ValueError("Input must be a string.")
+    if not value.strip():
+        raise ValueError("Input must be a non-empty string.")
+    return True
+
+
+def validate_email_format(email):
+    """Validates if the provided email has a valid format."""
+    import re
+    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not isinstance(email, str):
-        raise ValidationError('Email must be a string')
-    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    if not re.match(regex, email):
-        raise ValidationError('Invalid email format')
+        raise ValueError("Input must be a string.")
+    if not re.match(email_regex, email):
+        raise ValueError("Input must be a valid email address.")
     return True
 
 
-def validate_age(age):
-    if not isinstance(age, int):
-        raise ValidationError('Age must be an integer')
-    if age < 0 or age > 120:
-        raise ValidationError('Age must be between 0 and 120')
-    return True
+# Example usage
+if __name__ == '__main__':
+    try:
+        validate_positive_integer(-5)
+    except ValueError as e:
+        print(e)
 
+    try:
+        validate_non_empty_string('  ')
+    except ValueError as e:
+        print(e)
 
-def validate_username(username):
-    if not isinstance(username, str):
-        raise ValidationError('Username must be a string')
-    if len(username) < 3 or len(username) > 20:
-        raise ValidationError('Username must be between 3 and 20 characters')
-    return True
+    try:
+        validate_email_format('invalid-email')
+    except ValueError as e:
+        print(e)
