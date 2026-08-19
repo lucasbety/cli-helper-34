@@ -1,31 +1,32 @@
-import json
-import os
+import time
+import functools
 
-class FileProcessor:
-    def __init__(self, file_path):
-        self.file_path = file_path
+# Memoization decorator to cache results of expensive computations
+def memoize(func):
+    cache = {}
+    @functools.wraps(func)
+    def wrapper(*args):
+        if args not in cache:
+            result = func(*args)
+            cache[args] = result
+        return cache[args]
+    return wrapper
 
-    def read_file(self):
-        try:
-            if not os.path.exists(self.file_path):
-                raise FileNotFoundError(f'File {self.file_path} does not exist.')
-            with open(self.file_path, 'r') as file:
-                return file.read()
-        except FileNotFoundError as e:
-            return json.dumps({'error': str(e)})
-        except IOError as e:
-            return json.dumps({'error': 'An I/O error occurred: ' + str(e)})
+# Example expensive function that calculates Fibonacci
+@memoize
+def fibonacci(n):
+    if n < 0:
+        raise ValueError('Negative arguments are not supported')
+    elif n == 0:
+        return 0
+    elif n == 1:
+        return 1
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
 
-    def write_file(self, content):
-        try:
-            with open(self.file_path, 'w') as file:
-                file.write(content)
-        except IOError as e:
-            return json.dumps({'error': 'Failed to write file: ' + str(e)})
-
-# Usage example
-if __name__ == '__main__':
-    processor = FileProcessor('example.txt')
-    print(processor.read_file())
-    print(processor.write_file('Hello, World!'))
-    print(processor.read_file())
+# Performance improvement in computing Fibonacci series
+start_time = time.time()
+for i in range(35):  # Example for first 35 Fibonacci numbers
+    print(f'Fibonacci of {i} is {fibonacci(i)}')
+end_time = time.time()
+print(f'Computation time: {end_time - start_time} seconds')
