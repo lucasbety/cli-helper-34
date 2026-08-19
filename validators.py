@@ -1,20 +1,28 @@
 import re
 
-# Compile patterns for performance
-email_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-phone_pattern = re.compile(r'^(\+?[1-9]{1,4})?[-.\s]?\(?[2-9][0-9]{2}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$')
+class ValidationError(Exception):
+    pass
 
 def validate_email(email):
-    """Validate if the input is a valid email address."""
-    return bool(email_pattern.match(email))
+    if not isinstance(email, str):
+        raise ValidationError('Email must be a string')
+    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(regex, email):
+        raise ValidationError('Invalid email format')
+    return True
 
-def validate_phone(phone):
-    """Validate if the input is a valid phone number."""
-    return bool(phone_pattern.match(phone))
 
-# Example test cases
-if __name__ == '__main__':
-    print(validate_email('test@example.com'))  # Expected: True
-    print(validate_email('invalid-email'))      # Expected: False
-    print(validate_phone('+123-456-7890'))      # Expected: True
-    print(validate_phone('123-45-6789'))        # Expected: False
+def validate_age(age):
+    if not isinstance(age, int):
+        raise ValidationError('Age must be an integer')
+    if age < 0 or age > 120:
+        raise ValidationError('Age must be between 0 and 120')
+    return True
+
+
+def validate_username(username):
+    if not isinstance(username, str):
+        raise ValidationError('Username must be a string')
+    if len(username) < 3 or len(username) > 20:
+        raise ValidationError('Username must be between 3 and 20 characters')
+    return True
